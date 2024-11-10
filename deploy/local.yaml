@@ -1,0 +1,22 @@
+useStackTrace: true
+dcRedis:
+  host: "localhost"
+  port: 8803
+  maxPoolInterval: 5s
+  asidExp: "5m"
+vault:
+  host: "localhost"
+  port: 8801
+  clientTimeout: "10s"
+  tokenRepo:
+    path: "/v1/secret/data/auth-api/tokens"
+    astJwtSecretName: "astJwtSecret"
+  dcRedisSecret:
+    path: "/v1/secret/data/auth-storer/redis"
+    dcRedisUserName: dcRedisUser
+    dcRedisSecretName: dcRedisSecret
+    acRedisUserName: acRedisUser
+    acRedisSecretName: acRedisSecret
+grpcServer:
+  port: 4000
+  maxPollTime: 10s
