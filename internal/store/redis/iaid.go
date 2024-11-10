@@ -4,20 +4,19 @@ import (
 	"context"
 	"errors"
 	"github.com/go-redis/redis/v8"
-	"time"
 )
 
 var ErrorNotFound = errors.New("not found")
 
-func (r *Redis) PutIAID(ctx context.Context, login, iaid string) error {
+func (r *RedisAc) PutIAID(ctx context.Context, login, iaid string) error {
 	ctx, cancel := context.WithTimeout(ctx, r.MaxPoolInterval)
 
 	defer cancel()
 
-	return r.Client.Set(ctx, login, iaid, r.AsidExp).Err()
+	return r.Client.Set(ctx, login, iaid, 0).Err()
 }
 
-func (r *Redis) GetIAID(ctx context.Context, login string) (string, error) {
+func (r *RedisAc) GetIAID(ctx context.Context, login string) (string, error) {
 	ctx, cancel := context.WithTimeout(ctx, r.MaxPoolInterval)
 
 	defer cancel()
@@ -34,7 +33,7 @@ func (r *Redis) GetIAID(ctx context.Context, login string) (string, error) {
 	return res, nil
 }
 
-func (r *Redis) IsIAIDAlive(ctx context.Context, iaid string) (bool, error) {
+func (r *RedisAc) IsIAIDAlive(ctx context.Context, iaid string) (bool, error) {
 	ctx, cancel := context.WithTimeout(ctx, r.MaxPoolInterval)
 
 	defer cancel()
@@ -45,5 +44,5 @@ func (r *Redis) IsIAIDAlive(ctx context.Context, iaid string) (bool, error) {
 		return false, err
 	}
 
-	return ttl > 0*time.Second, nil
+	return ttl > 0, nil
 }

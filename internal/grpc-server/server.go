@@ -23,7 +23,7 @@ type GrpcServer struct {
 	MaxPollTime time.Duration
 }
 
-func NewGrpcServer(dc redis.IRedis, vault vault.IVault, cfg *config.AuthStorer, l *zerolog.Logger) (*GrpcServer, error) {
+func NewGrpcServer(dc redis.IRedisDc, ac redis.IRedisAc, vault vault.IVault, cfg *config.AuthStorer, l *zerolog.Logger) (*GrpcServer, error) {
 	s := grpc.NewServer()
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.GrpcServer.Port))
@@ -33,10 +33,11 @@ func NewGrpcServer(dc redis.IRedis, vault vault.IVault, cfg *config.AuthStorer, 
 	}
 
 	ast.RegisterAstServer(s, &server{
-		IRedis: dc,
-		IVault: vault,
-		Cfg:    cfg,
-		Logger: l,
+		IRedisDc: dc,
+		IRedisAc: ac,
+		IVault:   vault,
+		Cfg:      cfg,
+		Logger:   l,
 	})
 
 	return &GrpcServer{

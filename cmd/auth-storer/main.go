@@ -12,38 +12,36 @@ import (
 func main() {
 	erg, ctx := errgroup.WithContext(context.Background())
 
-	log.Info().Timestamp().Msg("starting auth-storer service...")
-	log.Info().Timestamp().Msg("initializing config...")
-
 	cfg, logger, err := config.InitConfig()
 
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to initialize config")
 	}
 
-	log.Info().Timestamp().Msg("initializing service...")
+	logger.Info().Timestamp().Msg("config initialized")
+	logger.Info().Timestamp().Msg("initializing service")
 
 	s, err := service.NewService(ctx, cfg, logger)
 
 	if err != nil {
-		log.Fatal().Err(err).Msg("failed to initialize service")
+		logger.Fatal().Err(err).Msg("failed to initialize service")
 	}
 
-	log.Info().Timestamp().Msg("starting service...")
+	logger.Info().Timestamp().Msg("starting service")
 
 	erg.Go(func() error {
 		return s.Start()
 	})
 
 	if err = erg.Wait(); err != nil {
-		log.Fatal().Err(err).Msg("failed to start service")
+		logger.Fatal().Err(err).Msg("failed to start service")
 	}
 
 	<-utils.GracefulShutDown()
 
-	log.Info().Timestamp().Msg("graceful shutdown")
+	logger.Info().Timestamp().Msg("graceful shutdown")
 
 	s.Stop()
 
-	log.Info().Timestamp().Msg("service stopped")
+	logger.Info().Timestamp().Msg("service stopped")
 }

@@ -15,10 +15,11 @@ import (
 
 type server struct {
 	ast.UnimplementedAstServer
-	IRedis redis.IRedis
-	IVault vault.IVault
-	Cfg    *config.AuthStorer
-	Logger *zerolog.Logger
+	IRedisDc redis.IRedisDc
+	IRedisAc redis.IRedisAc
+	IVault   vault.IVault
+	Cfg      *config.AuthStorer
+	Logger   *zerolog.Logger
 }
 
 func (s *server) GetIAID(ctx context.Context, in *ast.GetIAIDRequest) (*ast.GetIAIDResponse, error) {
@@ -45,7 +46,7 @@ func (s *server) GetIAID(ctx context.Context, in *ast.GetIAIDRequest) (*ast.GetI
 		return nil, err
 	}
 
-	iaid, err := s.IRedis.GetIAID(ctx, in.Login)
+	iaid, err := s.IRedisAc.GetIAID(ctx, in.Login)
 
 	if err != nil {
 		switch {
@@ -66,7 +67,7 @@ func (s *server) GetIAID(ctx context.Context, in *ast.GetIAIDRequest) (*ast.GetI
 	// example of validation sid
 	s.Logger.Info().Msgf("Validate new sid result: %v", sid.Validate(asid))
 
-	if err = s.IRedis.Set(ctx, asid, iaid); err != nil {
+	if err = s.IRedisDc.Set(ctx, asid, iaid); err != nil {
 		s.Logger.Err(err).Send()
 		return nil, status.Error(codes.Internal, "redis aborted: "+err.Error())
 	}

@@ -38,12 +38,14 @@ type (
 			AstJwtSecretName string `yaml:"astJwtSecretName"`
 		} `yaml:"tokenRepo"`
 
-		DpRedisSecret struct {
+		RedisSecret struct {
 			Path string `yaml:"path"`
 
-			DpRedisSecretName string `yaml:"dpRedisSecretName"`
-			DpRedisUserName   string `yaml:"dpRedisUserName"`
-		} `yaml:"dpRedisSecret"`
+			DcRedisSecretName string `yaml:"dcRedisSecretName"`
+			DcRedisUserName   string `yaml:"dcRedisUserName"`
+			AcRedisSecretName string `yaml:"acRedisSecretName"`
+			AcRedisUserName   string `yaml:"acRedisUserName"`
+		} `yaml:"dcRedisSecret"`
 	}
 
 	GrpcServer struct {

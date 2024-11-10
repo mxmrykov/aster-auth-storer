@@ -2,10 +2,9 @@ package redis
 
 import (
 	"context"
-	"time"
 )
 
-func (r *Redis) Set(ctx context.Context, asid, iaid string) error {
+func (r *RedisDc) Set(ctx context.Context, asid, iaid string) error {
 	ctx, cancel := context.WithTimeout(ctx, r.MaxPoolInterval)
 
 	defer cancel()
@@ -13,7 +12,7 @@ func (r *Redis) Set(ctx context.Context, asid, iaid string) error {
 	return r.Client.Set(ctx, asid, iaid, r.AsidExp).Err()
 }
 
-func (r *Redis) IsAlive(ctx context.Context, asid string) (bool, error) {
+func (r *RedisDc) IsAlive(ctx context.Context, asid string) (bool, error) {
 	ctx, cancel := context.WithTimeout(ctx, r.MaxPoolInterval)
 
 	defer cancel()
@@ -24,10 +23,10 @@ func (r *Redis) IsAlive(ctx context.Context, asid string) (bool, error) {
 		return false, err
 	}
 
-	return ttl > 0*time.Second, nil
+	return ttl > 0, nil
 }
 
-func (r *Redis) GetAsidUser(ctx context.Context, asid string) (string, error) {
+func (r *RedisDc) GetAsidUser(ctx context.Context, asid string) (string, error) {
 	ctx, cancel := context.WithTimeout(ctx, r.MaxPoolInterval)
 
 	defer cancel()

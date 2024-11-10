@@ -19,7 +19,7 @@ type Service struct {
 	Cfg     *config.AuthStorer
 
 	Vault      vault.IVault
-	IRedis     redis.IRedis
+	IRedis     redis.IRedisDc
 	GrpcServer *grpc_server.GrpcServer
 }
 
@@ -30,23 +30,23 @@ func NewService(ctx context.Context, cfg *config.AuthStorer, logger *zerolog.Log
 		logger.Fatal().Err(err).Msg("error initializing vault client")
 	}
 
-	if err != nil {
-		logger.Fatal().Err(err).Msg("error initializing etcd client")
-	}
-
-	dcSecrets, err := v.GetSecretRepo(ctx, cfg.Vault.DpRedisSecret.Path)
+	secrets, err := v.GetSecretRepo(ctx, cfg.Vault.RedisSecret.Path)
 
 	if err != nil {
-		logger.Fatal().Err(err).Msg("error getting dc-redis password")
+		logger.Fatal().Err(err).Msg("error getting dc-redis credentials")
 	}
 
-	dc := redis.NewRedis(
+	dc, ac := redis.NewRedisDc(
 		&cfg.DcRedis,
-		dcSecrets[cfg.Vault.DpRedisSecret.DpRedisUserName],
-		dcSecrets[cfg.Vault.DpRedisSecret.DpRedisSecretName],
+		secrets[cfg.Vault.RedisSecret.DcRedisUserName],
+		secrets[cfg.Vault.RedisSecret.DcRedisSecretName],
+	), redis.NewRedisAc(
+		&cfg.DcRedis,
+		secrets[cfg.Vault.RedisSecret.AcRedisUserName],
+		secrets[cfg.Vault.RedisSecret.AcRedisSecretName],
 	)
 
-	grpcServer, err := grpc_server.NewGrpcServer(dc, v, cfg, logger)
+	grpcServer, err := grpc_server.NewGrpcServer(dc, ac, v, cfg, logger)
 
 	return &Service{
 		Zerolog:    logger,
