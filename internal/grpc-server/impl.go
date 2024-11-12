@@ -47,25 +47,25 @@ func (s *server) GetIAID(ctx context.Context, in *ast.GetIAIDRequest) (*ast.GetI
 	}
 
 	iaid, err := s.IRedisAc.GetIAID(ctx, in.Login)
+	asid := sid.New(iaid)
+
+	// example of validation sid
+	s.Logger.Info().Msgf("Validate new sid result: %v", sid.Validate(asid))
 
 	if err != nil {
 		switch {
 		case errors.Is(err, redis.ErrorNotFound):
 			return &ast.GetIAIDResponse{
-				Has:  false,
-				IAID: "",
-				ASID: "",
+				Has:     false,
+				IAID:    "",
+				ASID:    asid,
+				Message: "no such login",
 			}, nil
 		default:
 			s.Logger.Err(err).Send()
 			return nil, status.Error(codes.Internal, "redis aborted: "+err.Error())
 		}
 	}
-
-	asid := sid.New(iaid)
-
-	// example of validation sid
-	s.Logger.Info().Msgf("Validate new sid result: %v", sid.Validate(asid))
 
 	if err = s.IRedisDc.Set(ctx, asid, iaid); err != nil {
 		s.Logger.Err(err).Send()
