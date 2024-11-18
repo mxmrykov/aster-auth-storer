@@ -55,6 +55,11 @@ func (s *server) GetIAID(ctx context.Context, in *ast.GetIAIDRequest) (*ast.GetI
 	if err != nil {
 		switch {
 		case errors.Is(err, redis.ErrorNotFound):
+			if err = s.IRedisDc.Set(ctx, asid, in.Login); err != nil {
+				s.Logger.Err(err).Send()
+				return nil, status.Error(codes.Internal, "redis aborted: "+err.Error())
+			}
+
 			return &ast.GetIAIDResponse{
 				Has:     false,
 				IAID:    "",

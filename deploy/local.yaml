@@ -5,7 +5,7 @@ dcRedis:
   maxPoolInterval: 5s
   asidExp: "15m"
 vault:
-  host: "localhost"
+  host: "83.220.175.189"
   port: 8801
   clientTimeout: "10s"
   tokenRepo:
