@@ -3,14 +3,15 @@ package redis
 import (
 	"context"
 	"fmt"
+	"time"
+
 	"github.com/go-redis/redis/v8"
 	"github.com/mxmrykov/aster-auth-storer/internal/config"
-	"time"
 )
 
 type IRedisDc interface {
 	Set(ctx context.Context, asid, iaid string) error
-	IsAlive(ctx context.Context, asid string) (bool, error)
+	GetIAID(ctx context.Context, login string) (string, error)
 	GetAsidUser(ctx context.Context, asid string) (string, error)
 }
 

@@ -3,6 +3,7 @@ package grpc_server
 import (
 	"context"
 	"errors"
+
 	"github.com/mxmrykov/aster-auth-storer/internal/config"
 	ast "github.com/mxmrykov/aster-auth-storer/internal/proto/gen"
 	"github.com/mxmrykov/aster-auth-storer/internal/store/redis"
@@ -46,7 +47,7 @@ func (s *server) GetIAID(ctx context.Context, in *ast.GetIAIDRequest) (*ast.GetI
 		return nil, err
 	}
 
-	iaid, err := s.IRedisAc.GetIAID(ctx, in.Login)
+	iaid, err := s.IRedisDc.GetIAID(ctx, in.Login)
 	asid := sid.New(iaid)
 
 	// example of validation sid
