@@ -3,7 +3,7 @@ dcRedis:
   host: "localhost"
   port: 8803
   maxPoolInterval: 5s
-  asidExp: "15m"
+  asidExp: "5m"
 vault:
   host: "83.220.175.189"
   port: 8801

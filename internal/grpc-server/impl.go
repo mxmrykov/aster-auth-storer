@@ -3,6 +3,7 @@ package grpc_server
 import (
 	"context"
 	"errors"
+	redis2 "github.com/go-redis/redis/v8"
 
 	"github.com/mxmrykov/aster-auth-storer/internal/config"
 	ast "github.com/mxmrykov/aster-auth-storer/internal/proto/gen"
@@ -55,7 +56,7 @@ func (s *server) GetIAID(ctx context.Context, in *ast.GetIAIDRequest) (*ast.GetI
 
 	if err != nil {
 		switch {
-		case errors.Is(err, redis.ErrorNotFound):
+		case errors.Is(err, redis2.Nil):
 			if err = s.IRedisDc.Set(ctx, asid, in.Login); err != nil {
 				s.Logger.Err(err).Send()
 				return nil, status.Error(codes.Internal, "redis aborted: "+err.Error())
