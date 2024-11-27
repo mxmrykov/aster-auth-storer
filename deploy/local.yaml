@@ -5,11 +5,11 @@ dcRedis:
   maxPoolInterval: 5s
   asidExp: "5m"
 vault:
-  host: "localhost"
+  host: "83.220.175.189"
   port: 8801
   clientTimeout: "10s"
   tokenRepo:
-    path: "/v1/secret/data/auth-api/tokens"
+    path: "/v1/secret/data/auth-storer/tokens"
     astJwtSecretName: "astJwtSecret"
   dcRedisSecret:
     path: "/v1/secret/data/auth-storer/redis"

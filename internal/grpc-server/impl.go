@@ -3,6 +3,8 @@ package grpc_server
 import (
 	"context"
 	"errors"
+	redis2 "github.com/go-redis/redis/v8"
+
 	"github.com/mxmrykov/aster-auth-storer/internal/config"
 	ast "github.com/mxmrykov/aster-auth-storer/internal/proto/gen"
 	"github.com/mxmrykov/aster-auth-storer/internal/store/redis"
@@ -46,26 +48,31 @@ func (s *server) GetIAID(ctx context.Context, in *ast.GetIAIDRequest) (*ast.GetI
 		return nil, err
 	}
 
-	iaid, err := s.IRedisAc.GetIAID(ctx, in.Login)
+	iaid, err := s.IRedisDc.GetIAID(ctx, in.Login)
+	asid := sid.New(iaid)
+
+	// example of validation sid
+	s.Logger.Info().Msgf("Validate new sid result: %v", sid.Validate(asid))
 
 	if err != nil {
 		switch {
-		case errors.Is(err, redis.ErrorNotFound):
+		case errors.Is(err, redis2.Nil):
+			if err = s.IRedisDc.Set(ctx, asid, in.Login); err != nil {
+				s.Logger.Err(err).Send()
+				return nil, status.Error(codes.Internal, "redis aborted: "+err.Error())
+			}
+
 			return &ast.GetIAIDResponse{
-				Has:  false,
-				IAID: "",
-				ASID: "",
+				Has:     false,
+				IAID:    "",
+				ASID:    asid,
+				Message: "no such login",
 			}, nil
 		default:
 			s.Logger.Err(err).Send()
 			return nil, status.Error(codes.Internal, "redis aborted: "+err.Error())
 		}
 	}
-
-	asid := sid.New(iaid)
-
-	// example of validation sid
-	s.Logger.Info().Msgf("Validate new sid result: %v", sid.Validate(asid))
 
 	if err = s.IRedisDc.Set(ctx, asid, iaid); err != nil {
 		s.Logger.Err(err).Send()

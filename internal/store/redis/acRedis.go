@@ -2,16 +2,16 @@ package redis
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/go-redis/redis/v8"
 	"github.com/mxmrykov/aster-auth-storer/internal/config"
 	"golang.org/x/net/context"
-	"time"
 )
 
 type IRedisAc interface {
 	PutIAID(ctx context.Context, login, iaid string) error
 	GetIAID(ctx context.Context, login string) (string, error)
-	IsIAIDAlive(ctx context.Context, iaid string) (bool, error)
 }
 
 type RedisAc struct {
